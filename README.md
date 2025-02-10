@@ -14,7 +14,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-I wanted to contribute to the Behaviors & Minimodes being written for Tehbot to help grow the use of it without having to submit pull requests for each update and without having to add to the creators plate of then supporting my additional code.
+I wanted to contribute to the Behaviors & Minimodes being written for Tehbot to help grow the use of it without having to submit pull requests for each update and without having to add to the creators plate of then supporting my additional code. Standard Addons are what ship with Tehbot. 
 
 Here's why:
 * If I ever stop supporting the code it will not be on the Tehbot creator to then pickup where I left off.
@@ -63,7 +63,25 @@ This behavior allows you to set who your leaders is, it will then begin approchi
 - [ ] Add the ability to use drone boats instead of triglavian ships
     - [ ] Add the ability to assign the drones to the leader for fighting purposes
 
+<h4>CombatAnoms - Behavior</h4>
+<p>
+This was originally written by Elusif, I have modified it and am trying to get it working 100%. Currently it can repair, undock and run the anoms you set it run, dock up if local has unfriendlies and undock after they leave. It currently can't reload drones or repair while running. I have modified this to only work with drone boats. 
+<br />
+</p>
 
+- [X] Initial Release 
+- [ ] Add the ability to dock up when needed
+    - [ ] Check if we need to reload drones, dock up and reload drones
+    - [ ] Check if we need to repair, if we do dock up and repair
+- [ ] Add the ability to use something other than drone boats
+
+Requirements:
+* Issues can be logged here to me and not on the main Tehbot github allowing me to work on them at my pace.
+* You can form this and not worry about messing up any of the core Tehbot files
+
+Required Addons:
+* (Standard Addons) LocalCheck, TargetManager, LavishNavTest, WatchDog, ISXSQLiteTest
+* DroneControlCA
 
 <!-- CONTRIBUTING -->
 ## Contributing
