@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ISUI>
+	<template name='Information.Font'>
+		<Name>Segoe</Name>
+		<Size>24</Size>
+		<Color>FFFFFFFF</Color>
+	</template>
+
+	<window name='Tehbot_SpiderTankReps'>
+		<Visible>1</Visible>
+		<BackGroundColor></BackGroundColor>
+		<Border>0</Border>
+		<X>200</X>
+		<Y>300</Y>
+		<Width>1600</Width>
+		<Height>1200</Height>
+		<TitleBar>
+			<Width>100%</Width>
+			<Height>40</Height>
+			<Border>0</Border>
+			<BackgroundColor>FF000000</BackgroundColor>
+			<Children>
+				<Text name='Tehbot_SpiderTankReps_TitleBar_Title'>
+					<X>0</X>
+					<Y>3</Y>
+					<Width>100%</Width>
+					<Height>40</Height>
+					<Alignment>Center</Alignment>
+					<Text>SpiderTankReps Configuration</Text>
+				</Text>
+				<button	Name='Close'>
+					<X>r80</X>
+					<Y>0</Y>
+					<Width>80</Width>
+					<Height>40</Height>
+					<Text>Close</Text>
+					<OnLeftClick>
+						ui -unload "&filepath;/SpiderTankReps"
+					</OnLeftClick>
+				</button>
+			</Children>
+		</TitleBar>
+		<Children name="Tehbot_SpiderTankReps_Children">
+			<Frame name="Tehbot_SpiderTankReps_Frame">
+				<X>0</X>
+				<Y>30</Y>
+				<Width>100%</Width>
+				<Height>100%</Height>
+				<BackgroundColor>FF000000</BackgroundColor>
+				<Border>1</Border>
+				<BorderColor>FFFFFFFF</BorderColor>
+				<Children name="Tehbot_SpiderTankReps_Frame_Children">
+					<Text name='obj_GridWatcherInformation'>
+						<Font template='Information.Font' />
+						<X>1%</X>
+						<Y>1%</Y>
+						<Width>98%</Width>
+						<Height>18%</Height>
+						<Wrap />
+						<Text>Remote Rep Manager.</Text>
+					</Text>
+					<Text name='RepArmorThresholdText'>
+						<X>1%</X>
+						<Y>7%</Y>
+						<Width>40%</Width>
+						<Height>3%</Height>
+						<Text>Rep Armour at${Script[Tehbot].VariableScope.SpiderTankReps.Config.RepArmorThreshold}%</Text>
+					</Text>
+					<Slider name='RepArmorThreshold'>
+						<X>41%</X>
+						<Y>7%</Y>
+						<Width>30%</Width>
+						<Height>4%</Height>
+						<Border>1</Border>
+						<OnLoad>
+							This:SetValue[${Script[Tehbot].VariableScope.SpiderTankReps.Config.RepArmorThreshold}]
+						</OnLoad>
+						<OnChange>
+							Script[Tehbot].VariableScope.SpiderTankReps.Config:SetRepArmorThreshold[${This.Value}]
+						</OnChange>
+					</Slider>
+					<Text name='RepShieldThresholdText'>
+						<X>1%</X>
+						<Y>12%</Y>
+						<Width>40%</Width>
+						<Height>3%</Height>
+						<Text>Rep Shield at${Script[Tehbot].VariableScope.SpiderTankReps.Config.RepShieldThreshold}%</Text>
+					</Text>
+					<Slider name='RepShieldThreshold'>
+						<X>41%</X>
+						<Y>12%</Y>
+						<Width>30%</Width>
+						<Height>4%</Height>
+						<Border>1</Border>
+						<OnLoad>
+							This:SetValue[${Script[Tehbot].VariableScope.SpiderTankReps.Config.RepShieldThreshold}]
+						</OnLoad>
+						<OnChange>
+							Script[Tehbot].VariableScope.SpiderTankReps.Config:SetRepShieldThreshold[${This.Value}]
+						</OnChange>
+					</Slider>
+					<Text name='CapOutThresholdText'>
+						<X>1%</X>
+						<Y>17%</Y>
+						<Width>40%</Width>
+						<Height>3%</Height>
+						<Text>Don't rep if below ${Script[Tehbot].VariableScope.SpiderTankReps.Config.CapOutThreshold}%</Text>
+					</Text>
+					<Slider name='CapOutThreshold'>
+						<X>41%</X>
+						<Y>17%</Y>
+						<Width>30%</Width>
+						<Height>4%</Height>
+						<Border>1</Border>
+						<OnLoad>
+							This:SetValue[${Script[Tehbot].VariableScope.SpiderTankReps.Config.CapOutThreshold}]
+						</OnLoad>
+						<OnChange>
+							Script[Tehbot].VariableScope.SpiderTankReps.Config:SetCapOutThreshold[${This.Value}]
+						</OnChange>
+					</Slider>
+					<Checkbox name='IsLeader'>
+						<X>1%</X>
+						<Y>21%</Y>
+						<Width>30%</Width>
+						<Height>3%</Height>
+						<Text>Is Leader</Text>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.SpiderTankReps.Config.IsLeader}
+							{
+								This:SetChecked
+							}
+						</OnLoad>
+						<OnLeftClick>
+							Script[Tehbot].VariableScope.SpiderTankReps.Config:SetIsLeader[${This.Checked}]
+						</OnLeftClick>
+					</Checkbox>
+					<Checkbox name='MaintainFleetLock'>
+						<X>1%</X>
+						<Y>25%</Y>
+						<Width>30%</Width>
+						<Height>3%</Height>
+						<Text>Maintain Fleet Lock</Text>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.SpiderTankReps.Config.MaintainFleetLock}
+							{
+								This:SetChecked
+							}
+						</OnLoad>
+						<OnLeftClick>
+							Script[Tehbot].VariableScope.SpiderTankReps.Config:SetMaintainFleetLock[${This.Checked}]
+						</OnLeftClick>
+					</Checkbox>
+					<Checkbox name='UseSecondaryTargetList'>
+						<X>1%</X>
+						<Y>33%</Y>
+						<Width>30%</Width>
+						<Height>3%</Height>
+						<Text>Secondary Target List</Text>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.SpiderTankReps.Config.UseSecondaryTargetList}
+							{
+								This:SetChecked
+							}
+						</OnLoad>
+						<OnLeftClick>
+							Script[Tehbot].VariableScope.SpiderTankReps.Config:SetUseSecondaryTargetList[${This.Checked}]
+						</OnLeftClick>
+					</Checkbox>
+				</Children>
+			</Frame>
+		</Children>
+	</window>
+
+</ISUI>
