@@ -1,0 +1,5141 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ISUI>
+	<template name='Information.Font'>
+		<Name>Segoe</Name>
+		<Size>24</Size>
+		<Color>FFFFFFFF</Color>
+	</template>
+
+	<window name='Tehbot_CombatAnoms'>
+		<Visible>1</Visible>
+		<BackGroundColor></BackGroundColor>
+		<Border>0</Border>
+		<X>200</X>
+		<Y>300</Y>
+		<Width>1200</Width>
+		<Height>750</Height>
+		<TitleBar>
+			<Width>100%</Width>
+			<Height>40</Height>
+			<Border>0</Border>
+			<BackgroundColor>FF000000</BackgroundColor>
+			<Children>
+				<Text name='CombatAnoms_TitleBar_Title'>
+					<X>0</X>
+					<Y>6</Y>
+					<Width>100%</Width>
+					<Height>40</Height>
+					<Alignment>Center</Alignment>
+					<Text>Mission Configuration</Text>
+				</Text>
+				<button	Name='Close'>
+					<X>r80</X>
+					<Y>0</Y>
+					<Width>80</Width>
+					<Height>40</Height>
+					<Text>Close</Text>
+					<OnLeftClick>
+						ui -unload "&filepath;/CombatAnoms"
+					</OnLeftClick>
+				</button>
+				<button	Name='Halt'>
+					<Font template='Button.Font' />
+					<BackgroundColor>FF000000</BackgroundColor>
+					<X>r240</X>
+					<Y>0</Y>
+					<Width>80</Width>
+					<Height>40</Height>
+					<Text>Halt</Text>
+					<OnLeftClick>
+						relay "all" -event Tehbot_ScheduleHalt
+					</OnLeftClick>
+					<OnMouseEnter>
+						UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This button will relay to all connected sessions running combat missions to halt after the next mission."]
+					</OnMouseEnter>
+					<OnMouseExit>
+						UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+					</OnMouseExit>
+				</button>
+				<button	Name='Resume'>
+					<Font template='Button.Font' />
+					<BackgroundColor>FF000000</BackgroundColor>
+					<X>r360</X>
+					<Y>0</Y>
+					<Width>120</Width>
+					<Height>40</Height>
+					<Text>Resume</Text>
+					<OnLeftClick>
+						relay "all" -event Tehbot_ScheduleResume
+					</OnLeftClick>
+					<OnMouseEnter>
+						UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This button will relay to all connected sessions running combat missions to resume running, if they were halted using the Halt button."]
+					</OnMouseEnter>
+					<OnMouseExit>
+						UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+					</OnMouseExit>
+				</button>
+			</Children>
+		</TitleBar>
+		<Children name="Tehbot_CombatAnoms_Children">
+			<Frame name="Tehbot_CombatAnoms_Frame">
+				<X>0</X>
+				<Y>30</Y>
+				<Width>100%</Width>
+				<Height>100%</Height>
+				<BackgroundColor>FF000000</BackgroundColor>
+				<Border>1</Border>
+				<BorderColor>FFFFFFFF</BorderColor>
+				<Children name="Tehbot_CombatAnoms_Frame_Children">
+					<Text name='obj_CombatInformation'>
+						<Font template='Information.Font' />
+						<X>1%</X>
+						<Y>1%</Y>
+						<Width>98%</Width>
+						<Height>18%</Height>
+						<Wrap />
+						<Text></Text>
+					</Text>
+			<TabControl	Name='CombatAnomTabs'>
+					<X>0</X>
+					<Y>30</Y>
+					<Width>100%</Width>
+					<Height>100%</Height>
+						<Tabs>
+							<Tab Name='CombatAnomMainTab'>
+								<frame name='CombatAnomMainTabFrame'>
+									<BackgroundColor>FF000000</BackgroundColor>
+									<Border>1</Border>
+									<BorderColor>FFFFFFFF</BorderColor>
+									<X>0</X>
+									<Y>0</Y>
+									<Height>100%</Height>
+									<Width>100%</Width>
+									<OnLoad>
+										This:SetLeftClickThru[TRUE]
+									</OnLoad>
+								</frame>
+							<Checkbox name='Halt'>
+								<X>1%</X>
+								<Y>1%</Y>
+								<Width>32%</Width>
+								<Height>4%</Height>
+								<Text>Halt After Mission</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.Halt}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetHalt[${This.Checked}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This will halt the bot after it completes the current mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+
+							<Text name='SRAmmoLabel'>
+								<X>35%</X>
+								<Y>3%</Y>
+								<Width>50%</Width>
+								<Height>5%</Height>
+								<Alignment>Left</Alignment>
+								<Text>Short Range Ammo</Text>
+							</Text>
+							<combobox Name="SRAmmo">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>50%</X>
+								<Y>2%</Y>
+								<Width>49%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									variable index:item cargo
+									EVEWindow[Inventory].ChildWindow[${Me.ShipID},ShipCargo]:GetItems[cargo]
+									cargo:RemoveByQuery[${LavishScript.CreateQuery[Category =- "Charge"]}, FALSE]
+									variable iterator c
+									cargo:GetIterator[c]
+									if ${c:First(exists)}
+										do
+										{
+											if !${This.ItemByText[${c.Value.Type}](exists)}
+											{
+												This:AddItem[${c.Value.Type}]
+											}
+										}
+										while ${c:Next(exists)}
+									if ${Me.Station(exists)}
+									{
+										EVEWindow[Inventory].ChildWindow[${Me.Station.ID},StationItems]:GetItems[cargo]
+										cargo:RemoveByQuery[${LavishScript.CreateQuery[Category =- "Charge"]}, FALSE]
+										if ${c:First(exists)}
+											do
+											{
+												if !${This.ItemByText[${c.Value.Type}](exists)}
+												{
+													This:AddItem[${c.Value.Type}]
+												}
+											}
+											while ${c:Next(exists)}
+									}
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SRAmmo.NotNULLOrEmpty}
+									{
+										if !${This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SRAmmo}](exists)}
+											This:AddItem[${Script[Tehbot].VariableScope.CombatAnoms.Config.SRAmmo}]
+									}
+									This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SRAmmo}]:Select
+									This:SetZOrder[movetop]
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSRAmmo[${This.SelectedItem.Text}]
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Short Range Ammo."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</combobox>
+
+							<Checkbox name='UseSecondary'>
+								<X>35%</X>
+								<Y>6%</Y>
+								<Width>50%</Width>
+								<Height>5%</Height>
+								<Text>Use Long-range Ammo</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.UseSecondaryAmmo}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSecondary[${This.Checked}]
+									if ${This.Checked}
+									{
+										UIElement[SRAmmoLabel2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+										UIElement[SRAmmo2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+									}
+									else
+									{
+										UIElement[SRAmmoLabel2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+										UIElement[SRAmmo2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+									}
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["If you are flying a ship that needs to swap between a short-range, higher damage ammo and a long-range, lower damage ammo, select this option.  Make sure you have enough cargo space to fit two times the ammo, AND any mission items you need to loot!"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+
+							<Text name='LR Ammo'>
+								<X>35%</X>
+								<Y>10%</Y>
+								<Width>50%</Width>
+								<Height>5%</Height>
+								<Alignment>Left</Alignment>
+								<Text>Long Range Ammo</Text>
+								<OnLoad>
+									if !${Script[Tehbot].VariableScope.CombatAnoms.Config.UseSecondaryAmmo}
+									{
+										This:Hide
+									}
+								</OnLoad>
+							</Text>
+							<combobox Name="LR AMMO2">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>50%</X>
+								<Y>13%</Y>
+								<Width>49%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									variable index:item cargo
+									EVEWindow[Inventory].ChildWindow[${Me.ShipID},ShipCargo]:GetItems[cargo]
+									cargo:RemoveByQuery[${LavishScript.CreateQuery[Category =- "Charge"]}, FALSE]
+									variable iterator c
+									cargo:GetIterator[c]
+									if ${c:First(exists)}
+										do
+										{
+											if !${This.ItemByText[${c.Value.Type}](exists)}
+											{
+												This:AddItem[${c.Value.Type}]
+											}
+										}
+										while ${c:Next(exists)}
+									if ${Me.Station(exists)}
+									{
+										EVEWindow[Inventory].ChildWindow[${Me.Station.ID},StationItems]:GetItems[cargo]
+										cargo:RemoveByQuery[${LavishScript.CreateQuery[Category =- "Charge"]}, FALSE]
+										if ${c:First(exists)}
+											do
+											{
+												if !${This.ItemByText[${c.Value.Type}](exists)}
+												{
+													This:AddItem[${c.Value.Type}]
+												}
+											}
+											while ${c:Next(exists)}
+									}
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.LRAmmo.NotNULLOrEmpty}
+									{
+										if !${This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.LRAmmo}](exists)}
+											This:AddItem[${Script[Tehbot].VariableScope.CombatAnoms.Config.LRAmmo}]
+									}
+									This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.LRAmmo}]:Select
+									This:SetZOrder[movetop]
+									if !${Script[Tehbot].VariableScope.CombatAnoms.Config.UseSecondaryAmmo}
+									{
+										This:Hide
+									}
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetLRAmmo[${This.SelectedItem.Text}]
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Long Range Ammo"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</combobox>
+							
+							<Checkbox name='UseTertiary'>
+								<X>35%</X>
+								<Y>16%</Y>
+								<Width>50%</Width>
+								<Height>5%</Height>
+								<Text>Use Xtra Long-range Ammo</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.UseTertiaryAmmo}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetTertiary[${This.Checked}]
+									if ${This.Checked}
+									{
+										UIElement[SRAmmoLabel2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+										UIElement[SRAmmo2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+									}
+									else
+									{
+										UIElement[SRAmmoLabel2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+										UIElement[SRAmmo2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+									}
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["For when you just need even more range"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+							
+							<Text name='XLR Ammo'>
+								<X>35%</X>
+								<Y>19%</Y>
+								<Width>50%</Width>
+								<Height>5%</Height>
+								<Alignment>Left</Alignment>
+								<Text>Extra Long Range Ammo</Text>
+								<OnLoad>
+									if !${Script[Tehbot].VariableScope.CombatAnoms.Config.UseTertiaryAmmo}
+									{
+										This:Hide
+									}
+								</OnLoad>
+							</Text>
+							<combobox Name="XLR AMMO2">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>50%</X>
+								<Y>22%</Y>
+								<Width>49%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									variable index:item cargo
+									EVEWindow[Inventory].ChildWindow[${Me.ShipID},ShipCargo]:GetItems[cargo]
+									cargo:RemoveByQuery[${LavishScript.CreateQuery[Category =- "Charge"]}, FALSE]
+									variable iterator c
+									cargo:GetIterator[c]
+									if ${c:First(exists)}
+										do
+										{
+											if !${This.ItemByText[${c.Value.Type}](exists)}
+											{
+												This:AddItem[${c.Value.Type}]
+											}
+										}
+										while ${c:Next(exists)}
+									if ${Me.Station(exists)}
+									{
+										EVEWindow[Inventory].ChildWindow[${Me.Station.ID},StationItems]:GetItems[cargo]
+										cargo:RemoveByQuery[${LavishScript.CreateQuery[Category =- "Charge"]}, FALSE]
+										if ${c:First(exists)}
+											do
+											{
+												if !${This.ItemByText[${c.Value.Type}](exists)}
+												{
+													This:AddItem[${c.Value.Type}]
+												}
+											}
+											while ${c:Next(exists)}
+									}
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.XLRAmmo.NotNULLOrEmpty}
+									{
+										if !${This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.XLRAmmo}](exists)}
+											This:AddItem[${Script[Tehbot].VariableScope.CombatAnoms.Config.XLRAmmo}]
+									}
+									This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.XLRAmmo}]:Select
+									This:SetZOrder[movetop]
+									if !${Script[Tehbot].VariableScope.CombatAnoms.Config.UseTertiaryAmmo}
+									{
+										This:Hide
+									}
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetXLRAmmo[${This.SelectedItem.Text}]
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Xtra Long Range Ammo"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</combobox>
+							
+
+							<Text name='AmmoSupplyTitle'>
+								<X>1%</X>
+								<Y>16%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Alignment>Center</Alignment>
+								<Text>
+									Ammo Supply Configuration
+								</Text>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures how many rounds of ammo you will load before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Text>
+							<Text name='AmmoSupplyValue'>
+								<X>1%</X>
+								<Y>21%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Alignment>Center</Alignment>
+								<OnLoad>
+									This:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad}]
+								</OnLoad>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures how many rounds of ammo you will load before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Text>
+							<button	Name='AmmoInc1'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>22%</X>
+								<Y>19%</Y>
+								<Width>3%</Width>
+								<Height>5%</Height>
+								<Text>1</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAmmoAmountToLoad[${Math.Calc[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad} + 1]}]
+									UIElement[AmmoSupplyValue@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures how many rounds of ammo you will load before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</button>
+							<button	Name='AmmoInc10'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>25%</X>
+								<Y>19%</Y>
+								<Width>3%</Width>
+								<Height>5%</Height>
+								<Text>10</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAmmoAmountToLoad[${Math.Calc[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad} + 10]}]
+									UIElement[AmmoSupplyValue@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures how many rounds of ammo you will load before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</button>
+							<button	Name='AmmoInc100'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>28%</X>
+								<Y>19%</Y>
+								<Width>3%</Width>
+								<Height>5%</Height>
+								<Text>100</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAmmoAmountToLoad[${Math.Calc[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad} + 100]}]
+									UIElement[AmmoSupplyValue@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures how many rounds of ammo you will load before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</button>
+							<button	Name='AmmoDec100'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>1%</X>
+								<Y>19%</Y>
+								<Width>3%</Width>
+								<Height>5%</Height>
+								<Text>100</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAmmoAmountToLoad[${Math.Calc[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad} - 100]}]
+									UIElement[AmmoSupplyValue@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures how many rounds of ammo you will load before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</button>
+							<button	Name='AmmoDec10'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>4%</X>
+								<Y>19%</Y>
+								<Width>3%</Width>
+								<Height>5%</Height>
+								<Text>10</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAmmoAmountToLoad[${Math.Calc[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad} - 10]}]
+									UIElement[AmmoSupplyValue@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures how many rounds of ammo you will load before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</button>
+							<button	Name='AmmoDec1'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>7%</X>
+								<Y>19%</Y>
+								<Width>3%</Width>
+								<Height>5%</Height>
+								<Text>1</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAmmoAmountToLoad[${Math.Calc[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad} - 1]}]
+									UIElement[AmmoSupplyValue@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AmmoAmountToLoad}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures how many rounds of ammo you will load before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</button>
+
+							<Checkbox name='OverheatWeapons'>
+								<X>1%</X>
+								<Y>25%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Text>Overheat Weapons</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.Overheat}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetOverheat[${This.Checked}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Overheat Weapons"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+
+							<Checkbox name='UseMTU'>
+								<X>1%</X>
+								<Y>29%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Text>Use MTU</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.UseMTU}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetUseMTU[${This.Checked}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Use MTU in site"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+
+							<combobox Name="MTUType">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>35%</X>
+								<Y>29%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									if !${Script[Tehbot].VariableScope.CombatAnoms.Config.UseMTU}
+										This:Hide
+									variable index:item cargo
+									variable iterator c
+									EVEWindow[Inventory].ChildWindow[${Me.ShipID},ShipCargo]:GetItems[cargo]
+									cargo:RemoveByQuery[${LavishScript.CreateQuery[Group =- "Mobile Tractor Unit"]}, FALSE]
+									cargo:GetIterator[c]
+									if ${c:First(exists)}
+										do
+										{
+											if !${This.ItemByText[${c.Value.Type}](exists)}
+											{
+												This:AddItem[${c.Value.Type}]
+											}
+										}
+										while ${c:Next(exists)}
+									if ${Me.Station(exists)}
+									{
+										EVEWindow[Inventory].ChildWindow[${Me.Station.ID},StationItems]:GetItems[cargo]
+										cargo:RemoveByQuery[${LavishScript.CreateQuery[Group =- "Mobile Tractor Unit"]}, FALSE]
+										cargo:GetIterator[c]
+										if ${c:First(exists)}
+											do
+											{
+												if !${This.ItemByText[${c.Value.Type}](exists)}
+													This:AddItem[${c.Value.Type}]
+											}
+											while ${c:Next(exists)}
+									}
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.MTUType.NotNULLOrEmpty}
+									{
+										if !${This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.MTUType}](exists)}
+											This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.MTUType}]:Select
+									}
+									This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.MTUType}]:Select
+									This:SetZOrder[movetop]
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetMTUType[${This.SelectedItem.Text}]
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Which MTU]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</combobox>
+							<Checkbox name='DroneBoat'>
+								<X>71%</X>
+								<Y>49%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Text>Drone Boat?</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneBoat}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneBoat[${This.Checked}]
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Are We A Drone Boat?"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+							<Checkbox name='UseDrugs'>
+								<X>36%</X>
+								<Y>49%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Text>Use Drugs</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.UseDrugs}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetUseDrugs[${This.Checked}]
+									if ${This.Checked}
+									{
+										UIElement[DrugsToUse@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+										UIElement[DrugsToUse2@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+									}
+									else
+									{
+										UIElement[DrugsToUse@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+										UIElement[DrugsToUse2@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+									}
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Are we using drugs?"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+
+							<combobox Name="DrugsToUse">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>36%</X>
+								<Y>53%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									if !${Script[Tehbot].VariableScope.CombatAnoms.Config.UseDrugs}
+										This:Hide
+									variable index:item cargo
+									variable iterator c
+									EVEWindow[Inventory].ChildWindow[${Me.ShipID},ShipCargo]:GetItems[cargo]
+									cargo:RemoveByQuery[${LavishScript.CreateQuery[Group == "Booster"]}, FALSE]
+									cargo:GetIterator[c]
+									if ${c:First(exists)}
+										do
+										{
+											if !${This.ItemByText[${c.Value.Type}](exists)}
+											{
+												This:AddItem[${c.Value.Type}]
+											}
+										}
+										while ${c:Next(exists)}
+									if ${Me.Station(exists)}
+									{
+										EVEWindow[Inventory].ChildWindow[${Me.Station.ID},StationItems]:GetItems[cargo]
+										cargo:RemoveByQuery[${LavishScript.CreateQuery[Group == "Booster"]}, FALSE]
+										cargo:GetIterator[c]
+										if ${c:First(exists)}
+											do
+											{
+												if !${This.ItemByText[${c.Value.Type}](exists)}
+													This:AddItem[${c.Value.Type}]
+											}
+											while ${c:Next(exists)}
+									}
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DrugsToUse.NotNULLOrEmpty}
+									{
+										if !${This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DrugsToUse}](exists)}
+											This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DrugsToUse}]:Select
+									}
+									This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DrugsToUse}]:Select
+									This:SetZOrder[movetop]
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetDrugsToUse[${This.SelectedItem.Text}]
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Drug choice 1"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</combobox>
+							
+							<combobox Name="DrugsToUse2">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>66%</X>
+								<Y>53%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									if !${Script[Tehbot].VariableScope.CombatAnoms.Config.UseDrugs}
+										This:Hide
+									variable index:item cargo
+									variable iterator c
+									EVEWindow[Inventory].ChildWindow[${Me.ShipID},ShipCargo]:GetItems[cargo]
+									cargo:RemoveByQuery[${LavishScript.CreateQuery[Group == "Booster"]}, FALSE]
+									cargo:GetIterator[c]
+									if ${c:First(exists)}
+										do
+										{
+											if !${This.ItemByText[${c.Value.Type}](exists)}
+											{
+												This:AddItem[${c.Value.Type}]
+											}
+										}
+										while ${c:Next(exists)}
+									if ${Me.Station(exists)}
+									{
+										EVEWindow[Inventory].ChildWindow[${Me.Station.ID},StationItems]:GetItems[cargo]
+										cargo:RemoveByQuery[${LavishScript.CreateQuery[Group == "Booster"]}, FALSE]
+										cargo:GetIterator[c]
+										if ${c:First(exists)}
+											do
+											{
+												if !${This.ItemByText[${c.Value.Type}](exists)}
+													This:AddItem[${c.Value.Type}]
+											}
+											while ${c:Next(exists)}
+									}
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DrugsToUse.NotNULLOrEmpty}
+									{
+										if !${This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DrugsToUse2}](exists)}
+											This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DrugsToUse2}]:Select
+									}
+									This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DrugsToUse2}]:Select
+									This:SetZOrder[movetop]
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetDrugsToUse2[${This.SelectedItem.Text}]
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Drug choice 2"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</combobox>
+
+							<Checkbox name='UseDrones'>
+								<X>1%</X>
+								<Y>49%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Text>Use Drones</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.UseDrones}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetDrones[${This.Checked}]
+									if ${This.Checked}
+									{
+										UIElement[DroneType@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+									}
+									else
+									{
+										UIElement[DroneType@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+									}
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Check this if you'll be using drones to shoot small shit. This tells the bot to make sure to top off drones before running a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+
+							<combobox Name="DroneType">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>1%</X>
+								<Y>53%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									if !${Script[Tehbot].VariableScope.CombatAnoms.Config.UseDrones}
+										This:Hide
+									variable index:item cargo
+									variable iterator c
+									EVEWindow[Inventory].ChildWindow[${Me.ShipID},ShipDroneBay]:GetItems[cargo]
+									cargo:RemoveByQuery[${LavishScript.CreateQuery[Category =- "Drone"]}, FALSE]
+									cargo:GetIterator[c]
+									if ${c:First(exists)}
+										do
+										{
+											if !${This.ItemByText[${c.Value.Type}](exists)}
+											{
+												This:AddItem[${c.Value.Type}]
+											}
+										}
+										while ${c:Next(exists)}
+									if ${Me.Station(exists)}
+									{
+										EVEWindow[Inventory].ChildWindow[${Me.Station.ID},StationItems]:GetItems[cargo]
+										cargo:RemoveByQuery[${LavishScript.CreateQuery[Category =- "Drone"]}, FALSE]
+										cargo:GetIterator[c]
+										if ${c:First(exists)}
+											do
+											{
+												if !${This.ItemByText[${c.Value.Type}](exists)}
+													This:AddItem[${c.Value.Type}]
+											}
+											while ${c:Next(exists)}
+									}
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneType.NotNULLOrEmpty}
+									{
+										if !${This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneType}](exists)}
+											This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneType}]:Select
+									}
+									This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneType}]:Select
+									This:SetZOrder[movetop]
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneType[${This.SelectedItem.Text}]
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This configures the type of drone the bot will top off before a mission."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</combobox>
+
+							<Text name='MunitionStorageTitle'>
+								<X>36%</X>
+								<Y>60%</Y>
+								<Width>30%</Width>
+								<Height>6%</Height>
+								<Alignment>Center</Alignment>
+								<Text>Ammo/Drone Storage</Text>
+							</Text>
+							<listbox Name="MunitionStorage">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<Border>1</Border>
+								<BorderColor>FFFFFFFF</BorderColor>
+								<X>36%</X>
+								<Y>66%</Y>
+								<Width>30%</Width>
+								<Height>9%</Height>
+								<Items>
+									<Item>Personal Hangar</Item>
+									<Item>Corporation Hangar</Item>
+								</Items>
+								<OnLoad>
+									This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.MunitionStorage}]:Select
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetMunitionStorage[${This.SelectedItem.Text}]
+									switch ${This.SelectedItem.Text}
+									{
+										case Corporation Hangar
+											UIElement[MunitionStorageFolderTitle@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+											UIElement[MunitionStorageFolder@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+											break
+										case Personal Hangar
+											UIElement[MunitionStorageFolderTitle@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+											UIElement[MunitionStorageFolder@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+											break
+									}
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Use this field to configure where you would like Tehbot to unload salvage loot."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</listbox>
+
+							<Text name='MunitionStorageFolderTitle'>
+								<X>69%</X>
+								<Y>60%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Alignment>Center</Alignment>
+								<Text>Corporation Folder</Text>
+								<OnLoad>
+									switch ${Script[Tehbot].VariableScope.CombatAnoms.Config.MunitionStorage}
+									{
+										case Corporation Hangar
+											This:Show
+											break
+										default
+											This:Hide
+											break
+									}
+								</OnLoad>
+							</Text>
+							<listbox Name="MunitionStorageFolder">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<Border>1</Border>
+								<BorderColor>FFFFFFFF</BorderColor>
+								<X>69%</X>
+								<Y>62%</Y>
+								<Width>30%</Width>
+								<Height>10%</Height>
+								<Items>
+									<Item>Folder1</Item>
+									<Item>Folder2</Item>
+									<Item>Folder3</Item>
+									<Item>Folder4</Item>
+									<Item>Folder5</Item>
+									<Item>Folder6</Item>
+									<Item>Folder7</Item>
+								</Items>
+								<OnLoad>
+									switch ${Script[Tehbot].VariableScope.CombatAnoms.Config.MunitionStorage}
+									{
+										case Corporation Hangar
+											This:Show
+											break
+										default
+											This:Hide
+											break
+									}
+									This.ItemByText["${Script[Tehbot].VariableScope.CombatAnoms.Config.MunitionStorageFolder}"]:Select
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetMunitionStorageFolder[${This.SelectedItem.Text}]
+								</OnSelect>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["This field is used to further configure your dropoff type for types that have additional options, like Corporate Hangars."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</listbox>
+							<Textentry Name="HomeStructure">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<Border>1</Border>
+								<BorderColor>FFFFFFFF</BorderColor>
+								<X>1%</X>
+								<Y>69%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									This:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.HomeStructure}]
+								</OnLoad>
+								<OnChange>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetHomeStructure[${This.Text}]
+								</OnChange>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["What BM is home?"]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Textentry>
+
+							<Checkbox name='DropOffToContainer'>
+								<X>36%</X>
+								<Y>75%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<Text>Unload Loot To Container</Text>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DropOffToContainer}
+									{
+										This:SetChecked
+									}
+								</OnLoad>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetDropOffToContainer[${This.Checked}]
+									if ${This.Checked}
+									{
+										UIElement[DropOffContainerName@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Show
+									}
+									else
+									{
+										UIElement[DropOffContainerName@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+									}
+								</OnLeftClick>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["Check this if you want to unload loot to station container."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Checkbox>
+
+							<Textentry Name="DropOffContainerName">
+								<Font template='Information.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<Border>1</Border>
+								<BorderColor>FFFFFFFF</BorderColor>
+								<X>1%</X>
+								<Y>73%</Y>
+								<Width>30%</Width>
+								<Height>5%</Height>
+								<OnLoad>
+									This:SetText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DropOffContainerName}]
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DropOffToContainer}
+									{
+										This:Show
+									}
+									else
+									{
+										This:Hide
+									}
+								</OnLoad>
+								<OnChange>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetDropOffContainerName[${This.Text}]
+								</OnChange>
+								<OnMouseEnter>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText["The bot will unload all the loot from missions to a station container with the specified name."]
+								</OnMouseEnter>
+								<OnMouseExit>
+									UIElement[Information@InformationFrame@CombatAnomMainTab@CombatAnomTabs@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:SetText[""]
+								</OnMouseExit>
+							</Textentry>
+
+							<Text name='InformationFrameTitle'>
+								<X>1%</X>
+								<Y>88%</Y>
+								<Width>32%</Width>
+								<Height>4%</Height>
+								<Text>Information</Text>
+								<OnLoad>
+									This.Font:SetColor[FFFFFF00]
+								</OnLoad>
+							</Text>
+							<Frame name="InformationFrame">
+								<X>0%</X>
+								<Y>90%</Y>
+								<Width>100%</Width>
+								<Height>12%</Height>
+								<BackgroundColor>FF000000</BackgroundColor>
+								<Border>1</Border>
+								<BorderColor>FFFFFFFF</BorderColor>
+								<Children>
+									<Text name='Information'>
+										<X>5%</X>
+										<Y>5%</Y>
+										<Width>90%</Width>
+										<Height>90%</Height>
+										<Wrap />
+										<VerticalAlignment>Center</VerticalAlignment>
+									</Text>
+								</Children>
+							</Frame>
+							</Tab>
+							<Tab Name='AngelAnoms'>
+								<frame name='AngelAnomsFrame'>
+									<BackgroundColor>FF000000</BackgroundColor>
+									<Border>1</Border>
+									<BorderColor>FFFFFFFF</BorderColor>
+									<X>0</X>
+									<Y>0</Y>
+									<Height>100%</Height>
+									<Width>100%</Width>
+									<OnLoad>
+										This:SetLeftClickThru[TRUE]
+									</OnLoad>
+								</frame>
+							<button	Name='AnomTabRecalcButton'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>69%</X>
+								<Y>5%</Y>
+								<Width>21%</Width>
+								<Height>15%</Height>
+								<Text>Recalculate Priorities</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.ReCalculatePriorities:Set[TRUE]
+								</OnLeftClick>
+							</button>
+							<Text name='AngelHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>3%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelHideaway</Text>
+								</Text>
+								<combobox name='AngelHideawayCombobox'>
+									<X>1%</X>
+									<Y>3%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelHiddenHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>6%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelHiddenHideaway</Text>
+								</Text>
+								<combobox name='AngelHiddenHideawayCombobox'>
+									<X>1%</X>
+									<Y>6%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHiddenHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHiddenHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelHiddenHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Hidden Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelForsakenHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>9%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelForsakenHideaway</Text>
+								</Text>
+								<combobox name='AngelForsakenHideawayCombobox'>
+									<X>1%</X>
+									<Y>9%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForsakenHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForsakenHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelForsakenHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Forsaken Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelForlornHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>12%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelForlornHideaway</Text>
+								</Text>
+								<combobox name='AngelForlornHideawayCombobox'>
+									<X>1%</X>
+									<Y>12%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForlornHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForlornHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelForlornHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Forlorn Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelBurrowComboboxLabel'>
+									<X>4%</X>
+									<Y>16%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelBurrow</Text>
+								</Text>
+								<combobox name='AngelBurrowCombobox'>
+									<X>1%</X>
+									<Y>16%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelBurrowPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelBurrowPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelBurrowPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Burrow",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelRefugeComboboxLabel'>
+									<X>4%</X>
+									<Y>20%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelRefuge</Text>
+								</Text>
+								<combobox name='AngelRefugeCombobox'>
+									<X>1%</X>
+									<Y>20%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelRefugePriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelRefugePriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelRefugePriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Refuge",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelDenComboboxLabel'>
+									<X>4%</X>
+									<Y>24%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelDen</Text>
+								</Text>
+								<combobox name='AngelDenCombobox'>
+									<X>1%</X>
+									<Y>24%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelHiddenDenComboboxLabel'>
+									<X>4%</X>
+									<Y>27%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelHiddenDen</Text>
+								</Text>
+								<combobox name='AngelHiddenDenCombobox'>
+									<X>1%</X>
+									<Y>27%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHiddenDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHiddenDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelHiddenDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Hidden Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelForsakenDenComboboxLabel'>
+									<X>4%</X>
+									<Y>30%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelForsakenDen</Text>
+								</Text>
+								<combobox name='AngelForsakenDenCombobox'>
+									<X>1%</X>
+									<Y>30%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForsakenDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForsakenDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelForsakenDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Forsaken Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelForlornDenComboboxLabel'>
+									<X>4%</X>
+									<Y>33%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelForlornDen</Text>
+								</Text>
+								<combobox name='AngelForlornDenCombobox'>
+									<X>1%</X>
+									<Y>33%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForlornDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForlornDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelForlornDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Forlorn Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelYardComboboxLabel'>
+									<X>4%</X>
+									<Y>37%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelYard</Text>
+								</Text>
+								<combobox name='AngelYardCombobox'>
+									<X>1%</X>
+									<Y>37%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelYardPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelYardPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelYardPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Yard",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>41%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelRallyPoint</Text>
+								</Text>
+								<combobox name='AngelRallyPointCombobox'>
+									<X>1%</X>
+									<Y>41%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelHiddenRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>44%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelHiddenRallyPoint</Text>
+								</Text>
+								<combobox name='AngelHiddenRallyPointCombobox'>
+									<X>1%</X>
+									<Y>44%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHiddenRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHiddenRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelHiddenRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Hidden Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelForsakenRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>47%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelForsakenRallyPoint</Text>
+								</Text>
+								<combobox name='AngelForsakenRallyPointCombobox'>
+									<X>1%</X>
+									<Y>47%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForsakenRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForsakenRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelForsakenRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Forsaken Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelForlornRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>50%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelForlornRallyPoint</Text>
+								</Text>
+								<combobox name='AngelForlornRallyPointCombobox'>
+									<X>1%</X>
+									<Y>50%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForlornRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForlornRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelForlornRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Forlorn Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelPortComboboxLabel'>
+									<X>4%</X>
+									<Y>54%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelPort</Text>
+								</Text>
+								<combobox name='AngelPortCombobox'>
+									<X>1%</X>
+									<Y>54%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelPortPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelPortPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelPortPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Port",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelHubComboboxLabel'>
+									<X>4%</X>
+									<Y>58%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelHub</Text>
+								</Text>
+								<combobox name='AngelHubCombobox'>
+									<X>1%</X>
+									<Y>58%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelHiddenHubComboboxLabel'>
+									<X>4%</X>
+									<Y>61%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelHiddenHub</Text>
+								</Text>
+								<combobox name='AngelHiddenHubCombobox'>
+									<X>1%</X>
+									<Y>61%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHiddenHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHiddenHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelHiddenHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Hidden Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelForsakenHubComboboxLabel'>
+									<X>4%</X>
+									<Y>64%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelForsakenHub</Text>
+								</Text>
+								<combobox name='AngelForsakenHubCombobox'>
+									<X>1%</X>
+									<Y>64%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForsakenHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForsakenHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelForsakenHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Forsaken Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelForlornHubComboboxLabel'>
+									<X>4%</X>
+									<Y>67%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelForlornHub</Text>
+								</Text>
+								<combobox name='AngelForlornHubCombobox'>
+									<X>1%</X>
+									<Y>67%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForlornHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelForlornHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelForlornHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Forlorn Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelHavenComboboxLabel'>
+									<X>4%</X>
+									<Y>71%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelHaven</Text>
+								</Text>
+								<combobox name='AngelHavenCombobox'>
+									<X>1%</X>
+									<Y>71%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHavenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelHavenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelHavenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Haven",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='AngelSanctumComboboxLabel'>
+									<X>4%</X>
+									<Y>75%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>AngelSanctum</Text>
+								</Text>
+								<combobox name='AngelSanctumCombobox'>
+									<X>1%</X>
+									<Y>75%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelSanctumPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.AngelSanctumPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetAngelSanctumPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Angel Sanctum",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								</Tab>
+							<Tab Name='BloodRaiderAnoms'>
+								<frame name='BloodRaiderAnomsFrame'>
+									<BackgroundColor>FF000000</BackgroundColor>
+									<Border>1</Border>
+									<BorderColor>FFFFFFFF</BorderColor>
+									<X>0</X>
+									<Y>0</Y>
+									<Height>100%</Height>
+									<Width>100%</Width>
+									<OnLoad>
+										This:SetLeftClickThru[TRUE]
+									</OnLoad>
+								</frame>
+							<button	Name='AnomTabRecalcButton'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>69%</X>
+								<Y>5%</Y>
+								<Width>21%</Width>
+								<Height>15%</Height>
+								<Text>Recalculate Priorities</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.ReCalculatePriorities:Set[TRUE]
+								</OnLeftClick>
+							</button>
+							<Text name='BloodHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>3%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodHideaway</Text>
+								</Text>
+								<combobox name='BloodHideawayCombobox'>
+									<X>1%</X>
+									<Y>3%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodHiddenHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>6%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodHiddenHideaway</Text>
+								</Text>
+								<combobox name='BloodHiddenHideawayCombobox'>
+									<X>1%</X>
+									<Y>6%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHiddenHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHiddenHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodHiddenHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Hidden Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodForsakenHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>9%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodForsakenHideaway</Text>
+								</Text>
+								<combobox name='BloodForsakenHideawayCombobox'>
+									<X>1%</X>
+									<Y>9%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForsakenHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForsakenHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodForsakenHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Forsaken Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodForlornHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>12%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodForlornHideaway</Text>
+								</Text>
+								<combobox name='BloodForlornHideawayCombobox'>
+									<X>1%</X>
+									<Y>12%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForlornHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForlornHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodForlornHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Forlorn Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodBurrowComboboxLabel'>
+									<X>4%</X>
+									<Y>16%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodBurrow</Text>
+								</Text>
+								<combobox name='BloodBurrowCombobox'>
+									<X>1%</X>
+									<Y>16%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodBurrowPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodBurrowPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodBurrowPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Burrow",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodRefugeComboboxLabel'>
+									<X>4%</X>
+									<Y>20%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodRefuge</Text>
+								</Text>
+								<combobox name='BloodRefugeCombobox'>
+									<X>1%</X>
+									<Y>20%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodRefugePriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodRefugePriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodRefugePriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Refuge",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodDenComboboxLabel'>
+									<X>4%</X>
+									<Y>24%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodDen</Text>
+								</Text>
+								<combobox name='BloodDenCombobox'>
+									<X>1%</X>
+									<Y>24%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodHiddenDenComboboxLabel'>
+									<X>4%</X>
+									<Y>27%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodHiddenDen</Text>
+								</Text>
+								<combobox name='BloodHiddenDenCombobox'>
+									<X>1%</X>
+									<Y>27%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHiddenDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHiddenDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodHiddenDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Hidden Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodForsakenDenComboboxLabel'>
+									<X>4%</X>
+									<Y>30%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodForsakenDen</Text>
+								</Text>
+								<combobox name='BloodForsakenDenCombobox'>
+									<X>1%</X>
+									<Y>30%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForsakenDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForsakenDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodForsakenDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Forsaken Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodForlornDenComboboxLabel'>
+									<X>4%</X>
+									<Y>33%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodForlornDen</Text>
+								</Text>
+								<combobox name='BloodForlornDenCombobox'>
+									<X>1%</X>
+									<Y>33%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForlornDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForlornDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodForlornDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Forlorn Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodYardComboboxLabel'>
+									<X>4%</X>
+									<Y>37%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodYard</Text>
+								</Text>
+								<combobox name='BloodYardCombobox'>
+									<X>1%</X>
+									<Y>37%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodYardPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodYardPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodYardPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Yard",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>41%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodRallyPoint</Text>
+								</Text>
+								<combobox name='BloodRallyPointCombobox'>
+									<X>1%</X>
+									<Y>41%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodHiddenRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>44%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodHiddenRallyPoint</Text>
+								</Text>
+								<combobox name='BloodHiddenRallyPointCombobox'>
+									<X>1%</X>
+									<Y>44%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHiddenRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHiddenRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodHiddenRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Hidden Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodForsakenRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>47%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodForsakenRallyPoint</Text>
+								</Text>
+								<combobox name='BloodForsakenRallyPointCombobox'>
+									<X>1%</X>
+									<Y>47%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForsakenRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForsakenRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodForsakenRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Forsaken Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodForlornRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>50%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodForlornRallyPoint</Text>
+								</Text>
+								<combobox name='BloodForlornRallyPointCombobox'>
+									<X>1%</X>
+									<Y>50%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForlornRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForlornRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodForlornRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Forlorn Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodPortComboboxLabel'>
+									<X>4%</X>
+									<Y>54%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodPort</Text>
+								</Text>
+								<combobox name='BloodPortCombobox'>
+									<X>1%</X>
+									<Y>54%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodPortPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodPortPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodPortPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Port",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodHubComboboxLabel'>
+									<X>4%</X>
+									<Y>58%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodHub</Text>
+								</Text>
+								<combobox name='BloodHubCombobox'>
+									<X>1%</X>
+									<Y>58%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodHiddenHubComboboxLabel'>
+									<X>4%</X>
+									<Y>61%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodHiddenHub</Text>
+								</Text>
+								<combobox name='BloodHiddenHubCombobox'>
+									<X>1%</X>
+									<Y>61%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHiddenHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHiddenHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodHiddenHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Hidden Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodForsakenHubComboboxLabel'>
+									<X>4%</X>
+									<Y>64%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodForsakenHub</Text>
+								</Text>
+								<combobox name='BloodForsakenHubCombobox'>
+									<X>1%</X>
+									<Y>64%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForsakenHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForsakenHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodForsakenHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Forsaken Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodForlornHubComboboxLabel'>
+									<X>4%</X>
+									<Y>67%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodForlornHub</Text>
+								</Text>
+								<combobox name='BloodForlornHubCombobox'>
+									<X>1%</X>
+									<Y>67%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForlornHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodForlornHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodForlornHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Forlorn Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodHavenComboboxLabel'>
+									<X>4%</X>
+									<Y>71%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodHaven</Text>
+								</Text>
+								<combobox name='BloodHavenCombobox'>
+									<X>1%</X>
+									<Y>71%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHavenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodHavenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodHavenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Haven",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='BloodSanctumComboboxLabel'>
+									<X>4%</X>
+									<Y>75%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>BloodSanctum</Text>
+								</Text>
+								<combobox name='BloodSanctumCombobox'>
+									<X>1%</X>
+									<Y>75%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodSanctumPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.BloodSanctumPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetBloodSanctumPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Blood Sanctum",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+							</Tab>
+							<Tab Name='GuristasAnoms'>
+								<frame name='GuristasAnomsFrame'>
+									<BackgroundColor>FF000000</BackgroundColor>
+									<Border>1</Border>
+									<BorderColor>FFFFFFFF</BorderColor>
+									<X>0</X>
+									<Y>0</Y>
+									<Height>100%</Height>
+									<Width>100%</Width>
+									<OnLoad>
+										This:SetLeftClickThru[TRUE]
+									</OnLoad>
+								</frame>
+							<button	Name='AnomTabRecalcButton'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>69%</X>
+								<Y>5%</Y>
+								<Width>21%</Width>
+								<Height>15%</Height>
+								<Text>Recalculate Priorities</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.ReCalculatePriorities:Set[TRUE]
+								</OnLeftClick>
+							</button>
+							<Text name='GuristasHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>3%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasHideaway</Text>
+								</Text>
+								<combobox name='GuristasHideawayCombobox'>
+									<X>1%</X>
+									<Y>3%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasHiddenHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>6%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasHiddenHideaway</Text>
+								</Text>
+								<combobox name='GuristasHiddenHideawayCombobox'>
+									<X>1%</X>
+									<Y>6%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHiddenHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHiddenHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasHiddenHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Hidden Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasForsakenHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>9%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasForsakenHideaway</Text>
+								</Text>
+								<combobox name='GuristasForsakenHideawayCombobox'>
+									<X>1%</X>
+									<Y>9%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForsakenHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForsakenHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasForsakenHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Forsaken Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasForlornHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>12%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasForlornHideaway</Text>
+								</Text>
+								<combobox name='GuristasForlornHideawayCombobox'>
+									<X>1%</X>
+									<Y>12%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForlornHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForlornHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasForlornHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Forlorn Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasBurrowComboboxLabel'>
+									<X>4%</X>
+									<Y>16%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasBurrow</Text>
+								</Text>
+								<combobox name='GuristasBurrowCombobox'>
+									<X>1%</X>
+									<Y>16%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasBurrowPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasBurrowPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasBurrowPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Burrow",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasRefugeComboboxLabel'>
+									<X>4%</X>
+									<Y>20%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasRefuge</Text>
+								</Text>
+								<combobox name='GuristasRefugeCombobox'>
+									<X>1%</X>
+									<Y>20%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasRefugePriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasRefugePriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasRefugePriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Refuge",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasDenComboboxLabel'>
+									<X>4%</X>
+									<Y>24%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasDen</Text>
+								</Text>
+								<combobox name='GuristasDenCombobox'>
+									<X>1%</X>
+									<Y>24%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasHiddenDenComboboxLabel'>
+									<X>4%</X>
+									<Y>27%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasHiddenDen</Text>
+								</Text>
+								<combobox name='GuristasHiddenDenCombobox'>
+									<X>1%</X>
+									<Y>27%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHiddenDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHiddenDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasHiddenDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Hidden Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasForsakenDenComboboxLabel'>
+									<X>4%</X>
+									<Y>30%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasForsakenDen</Text>
+								</Text>
+								<combobox name='GuristasForsakenDenCombobox'>
+									<X>1%</X>
+									<Y>30%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForsakenDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForsakenDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasForsakenDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Forsaken Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasForlornDenComboboxLabel'>
+									<X>4%</X>
+									<Y>33%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasForlornDen</Text>
+								</Text>
+								<combobox name='GuristasForlornDenCombobox'>
+									<X>1%</X>
+									<Y>33%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForlornDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForlornDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasForlornDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Forlorn Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasYardComboboxLabel'>
+									<X>4%</X>
+									<Y>37%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasYard</Text>
+								</Text>
+								<combobox name='GuristasYardCombobox'>
+									<X>1%</X>
+									<Y>37%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasYardPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasYardPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasYardPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Yard",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>41%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasRallyPoint</Text>
+								</Text>
+								<combobox name='GuristasRallyPointCombobox'>
+									<X>1%</X>
+									<Y>41%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasHiddenRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>44%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasHiddenRallyPoint</Text>
+								</Text>
+								<combobox name='GuristasHiddenRallyPointCombobox'>
+									<X>1%</X>
+									<Y>44%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHiddenRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHiddenRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasHiddenRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Hidden Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasForsakenRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>47%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasForsakenRallyPoint</Text>
+								</Text>
+								<combobox name='GuristasForsakenRallyPointCombobox'>
+									<X>1%</X>
+									<Y>47%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForsakenRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForsakenRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasForsakenRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Forsaken Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasForlornRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>50%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasForlornRallyPoint</Text>
+								</Text>
+								<combobox name='GuristasForlornRallyPointCombobox'>
+									<X>1%</X>
+									<Y>50%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForlornRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForlornRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasForlornRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Forlorn Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasPortComboboxLabel'>
+									<X>4%</X>
+									<Y>54%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasPort</Text>
+								</Text>
+								<combobox name='GuristasPortCombobox'>
+									<X>1%</X>
+									<Y>54%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasPortPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasPortPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasPortPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Port",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasHubComboboxLabel'>
+									<X>4%</X>
+									<Y>58%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasHub</Text>
+								</Text>
+								<combobox name='GuristasHubCombobox'>
+									<X>1%</X>
+									<Y>58%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasHiddenHubComboboxLabel'>
+									<X>4%</X>
+									<Y>61%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasHiddenHub</Text>
+								</Text>
+								<combobox name='GuristasHiddenHubCombobox'>
+									<X>1%</X>
+									<Y>61%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHiddenHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHiddenHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasHiddenHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Hidden Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasForsakenHubComboboxLabel'>
+									<X>4%</X>
+									<Y>64%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasForsakenHub</Text>
+								</Text>
+								<combobox name='GuristasForsakenHubCombobox'>
+									<X>1%</X>
+									<Y>64%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForsakenHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForsakenHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasForsakenHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Forsaken Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasForlornHubComboboxLabel'>
+									<X>4%</X>
+									<Y>67%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasForlornHub</Text>
+								</Text>
+								<combobox name='GuristasForlornHubCombobox'>
+									<X>1%</X>
+									<Y>67%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForlornHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasForlornHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasForlornHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Forlorn Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasHavenComboboxLabel'>
+									<X>4%</X>
+									<Y>71%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasHaven</Text>
+								</Text>
+								<combobox name='GuristasHavenCombobox'>
+									<X>1%</X>
+									<Y>71%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHavenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasHavenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasHavenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Haven",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='GuristasSanctumComboboxLabel'>
+									<X>4%</X>
+									<Y>75%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>GuristasSanctum</Text>
+								</Text>
+								<combobox name='GuristasSanctumCombobox'>
+									<X>1%</X>
+									<Y>75%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasSanctumPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.GuristasSanctumPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetGuristasSanctumPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Guristas Sanctum",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+							</Tab>
+							<Tab Name='SanshaAnoms'>
+								<frame name='SanshaAnomsFrame'>
+									<BackgroundColor>FF000000</BackgroundColor>
+									<Border>1</Border>
+									<BorderColor>FFFFFFFF</BorderColor>
+									<X>0</X>
+									<Y>0</Y>
+									<Height>100%</Height>
+									<Width>100%</Width>
+									<OnLoad>
+										This:SetLeftClickThru[TRUE]
+									</OnLoad>
+								</frame>
+							<button	Name='AnomTabRecalcButton'>
+								<Font template='Button.Font' />
+								<BackgroundColor>FF000000</BackgroundColor>
+								<X>69%</X>
+								<Y>5%</Y>
+								<Width>21%</Width>
+								<Height>15%</Height>
+								<Text>Recalculate Priorities</Text>
+								<OnLeftClick>
+									Script[Tehbot].VariableScope.CombatAnoms.ReCalculatePriorities:Set[TRUE]
+								</OnLeftClick>
+							</button>
+							<Text name='SanshaHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>3%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaHideaway</Text>
+								</Text>
+								<combobox name='SanshaHideawayCombobox'>
+									<X>1%</X>
+									<Y>3%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaHiddenHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>6%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaHiddenHideaway</Text>
+								</Text>
+								<combobox name='SanshaHiddenHideawayCombobox'>
+									<X>1%</X>
+									<Y>6%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHiddenHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHiddenHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaHiddenHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Hidden Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaForsakenHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>9%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaForsakenHideaway</Text>
+								</Text>
+								<combobox name='SanshaForsakenHideawayCombobox'>
+									<X>1%</X>
+									<Y>9%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForsakenHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForsakenHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaForsakenHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Forsaken Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaForlornHideawayComboboxLabel'>
+									<X>4%</X>
+									<Y>12%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaForlornHideaway</Text>
+								</Text>
+								<combobox name='SanshaForlornHideawayCombobox'>
+									<X>1%</X>
+									<Y>12%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForlornHideawayPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForlornHideawayPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaForlornHideawayPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Forlorn Hideaway",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaBurrowComboboxLabel'>
+									<X>4%</X>
+									<Y>16%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaBurrow</Text>
+								</Text>
+								<combobox name='SanshaBurrowCombobox'>
+									<X>1%</X>
+									<Y>16%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaBurrowPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaBurrowPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaBurrowPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Burrow",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaRefugeComboboxLabel'>
+									<X>4%</X>
+									<Y>20%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaRefuge</Text>
+								</Text>
+								<combobox name='SanshaRefugeCombobox'>
+									<X>1%</X>
+									<Y>20%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaRefugePriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaRefugePriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaRefugePriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Refuge",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaDenComboboxLabel'>
+									<X>4%</X>
+									<Y>24%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaDen</Text>
+								</Text>
+								<combobox name='SanshaDenCombobox'>
+									<X>1%</X>
+									<Y>24%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaHiddenDenComboboxLabel'>
+									<X>4%</X>
+									<Y>27%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaHiddenDen</Text>
+								</Text>
+								<combobox name='SanshaHiddenDenCombobox'>
+									<X>1%</X>
+									<Y>27%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHiddenDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHiddenDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaHiddenDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Hidden Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaForsakenDenComboboxLabel'>
+									<X>4%</X>
+									<Y>30%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaForsakenDen</Text>
+								</Text>
+								<combobox name='SanshaForsakenDenCombobox'>
+									<X>1%</X>
+									<Y>30%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForsakenDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForsakenDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaForsakenDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Forsaken Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaForlornDenComboboxLabel'>
+									<X>4%</X>
+									<Y>33%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaForlornDen</Text>
+								</Text>
+								<combobox name='SanshaForlornDenCombobox'>
+									<X>1%</X>
+									<Y>33%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForlornDenPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForlornDenPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaForlornDenPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Forlorn Den",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaYardComboboxLabel'>
+									<X>4%</X>
+									<Y>37%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaYard</Text>
+								</Text>
+								<combobox name='SanshaYardCombobox'>
+									<X>1%</X>
+									<Y>37%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaYardPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaYardPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaYardPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Yard",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>41%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaRallyPoint</Text>
+								</Text>
+								<combobox name='SanshaRallyPointCombobox'>
+									<X>1%</X>
+									<Y>41%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaHiddenRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>44%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaHiddenRallyPoint</Text>
+								</Text>
+								<combobox name='SanshaHiddenRallyPointCombobox'>
+									<X>1%</X>
+									<Y>44%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHiddenRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHiddenRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaHiddenRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Hidden Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaForsakenRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>47%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaForsakenRallyPoint</Text>
+								</Text>
+								<combobox name='SanshaForsakenRallyPointCombobox'>
+									<X>1%</X>
+									<Y>47%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForsakenRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForsakenRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaForsakenRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Forsaken Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaForlornRallyPointComboboxLabel'>
+									<X>4%</X>
+									<Y>50%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaForlornRallyPoint</Text>
+								</Text>
+								<combobox name='SanshaForlornRallyPointCombobox'>
+									<X>1%</X>
+									<Y>50%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForlornRallyPointPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForlornRallyPointPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaForlornRallyPointPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Forlorn Rally Point",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaPortComboboxLabel'>
+									<X>4%</X>
+									<Y>54%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaPort</Text>
+								</Text>
+								<combobox name='SanshaPortCombobox'>
+									<X>1%</X>
+									<Y>54%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaPortPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaPortPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaPortPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Port",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaHubComboboxLabel'>
+									<X>4%</X>
+									<Y>58%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaHub</Text>
+								</Text>
+								<combobox name='SanshaHubCombobox'>
+									<X>1%</X>
+									<Y>58%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+							<Text name='SanshaHiddenHubComboboxLabel'>
+									<X>4%</X>
+									<Y>61%</Y>
+									<Width>50%</Width>
+									<Height>5%</Height>
+									<Alignment>Left</Alignment>
+									<Text>SanshaHiddenHub</Text>
+								</Text>
+								<combobox name='SanshaHiddenHubCombobox'>
+									<X>1%</X>
+									<Y>61%</Y>
+									<Width>40</Width> 
+									<Height>20</Height> 
+									<FullHeight>80</FullHeight>
+									<ButtonWidth>20</ButtonWidth>
+									<Items>
+										<Item Value='0'>0</Item>
+										<Item Value='1'>1</Item>
+										<Item Value='2'>2</Item>
+										<Item Value='3'>3</Item>
+									</Items>
+								<OnLoad>
+									if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHiddenHubPriority} > -1
+										This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHiddenHubPriority}]:Select
+
+								</OnLoad>
+								<OnSelect>
+									Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaHiddenHubPriority[${This.SelectedItem.Value}]
+									Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Hidden Hub",${This.SelectedItem.Value}]
+								</OnSelect>
+								</combobox>
+								
+					<Text name='SanshaForsakenHubComboboxLabel'>
+							<X>4%</X>
+							<Y>64%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SanshaForsakenHub</Text>
+						</Text>
+						<combobox name='SanshaForsakenHubCombobox'>
+							<X>1%</X>
+							<Y>64%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForsakenHubPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForsakenHubPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaForsakenHubPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Forsaken Hub",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SanshaForlornHubComboboxLabel'>
+							<X>4%</X>
+							<Y>67%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SanshaForlornHub</Text>
+						</Text>
+						<combobox name='SanshaForlornHubCombobox'>
+							<X>1%</X>
+							<Y>67%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForlornHubPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaForlornHubPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaForlornHubPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Forlorn Hub",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SanshaHavenComboboxLabel'>
+							<X>4%</X>
+							<Y>71%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SanshaHaven</Text>
+						</Text>
+						<combobox name='SanshaHavenCombobox'>
+							<X>1%</X>
+							<Y>71%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHavenPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaHavenPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaHavenPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Haven",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SanshaSanctumComboboxLabel'>
+							<X>4%</X>
+							<Y>75%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SanshaSanctum</Text>
+						</Text>
+						<combobox name='SanshaSanctumCombobox'>
+							<X>1%</X>
+							<Y>75%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaSanctumPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SanshaSanctumPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSanshaSanctumPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Sansha Sanctum",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+								
+								</Tab>
+					<Tab Name='SerpentisAnoms'>
+						<frame name='SerpentisAnoms'>
+							<BackgroundColor>FF000000</BackgroundColor>
+							<Border>1</Border>
+							<BorderColor>FFFFFFFF</BorderColor>
+							<X>0</X>
+							<Y>0</Y>
+							<Height>100%</Height>
+							<Width>100%</Width>
+							<OnLoad>
+								This:SetLeftClickThru[TRUE]
+							</OnLoad>
+						</frame>
+					<button	Name='AnomTabRecalcButton'>
+						<Font template='Button.Font' />
+						<BackgroundColor>FF000000</BackgroundColor>
+						<X>69%</X>
+						<Y>5%</Y>
+						<Width>21%</Width>
+						<Height>15%</Height>
+						<Text>Recalculate Priorities</Text>
+						<OnLeftClick>
+							Script[Tehbot].VariableScope.CombatAnoms.ReCalculatePriorities:Set[TRUE]
+						</OnLeftClick>
+					</button>
+					<Text name='SerpentisHideawayComboboxLabel'>
+							<X>4%</X>
+							<Y>3%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisHideaway</Text>
+						</Text>
+						<combobox name='SerpentisHideawayCombobox'>
+							<X>1%</X>
+							<Y>3%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHideawayPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHideawayPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisHideawayPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Hideaway",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisHiddenHideawayComboboxLabel'>
+							<X>4%</X>
+							<Y>6%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisHiddenHideaway</Text>
+						</Text>
+						<combobox name='SerpentisHiddenHideawayCombobox'>
+							<X>1%</X>
+							<Y>6%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHiddenHideawayPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHiddenHideawayPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisHiddenHideawayPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Hidden Hideaway",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisForsakenHideawayComboboxLabel'>
+							<X>4%</X>
+							<Y>9%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisForsakenHideaway</Text>
+						</Text>
+						<combobox name='SerpentisForsakenHideawayCombobox'>
+							<X>1%</X>
+							<Y>9%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForsakenHideawayPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForsakenHideawayPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisForsakenHideawayPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Forsaken Hideaway",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisForlornHideawayComboboxLabel'>
+							<X>4%</X>
+							<Y>12%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisForlornHideaway</Text>
+						</Text>
+						<combobox name='SerpentisForlornHideawayCombobox'>
+							<X>1%</X>
+							<Y>12%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForlornHideawayPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForlornHideawayPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisForlornHideawayPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Forlorn Hideaway",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisBurrowComboboxLabel'>
+							<X>4%</X>
+							<Y>16%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisBurrow</Text>
+						</Text>
+						<combobox name='SerpentisBurrowCombobox'>
+							<X>1%</X>
+							<Y>16%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisBurrowPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisBurrowPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisBurrowPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Burrow",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisRefugeComboboxLabel'>
+							<X>4%</X>
+							<Y>20%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisRefuge</Text>
+						</Text>
+						<combobox name='SerpentisRefugeCombobox'>
+							<X>1%</X>
+							<Y>20%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisRefugePriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisRefugePriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisRefugePriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Refuge",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisDenComboboxLabel'>
+							<X>4%</X>
+							<Y>24%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisDen</Text>
+						</Text>
+						<combobox name='SerpentisDenCombobox'>
+							<X>1%</X>
+							<Y>24%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisDenPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisDenPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisDenPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Den",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisHiddenDenComboboxLabel'>
+							<X>4%</X>
+							<Y>27%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisHiddenDen</Text>
+						</Text>
+						<combobox name='SerpentisHiddenDenCombobox'>
+							<X>1%</X>
+							<Y>27%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHiddenDenPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHiddenDenPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisHiddenDenPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Hidden Den",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisForsakenDenComboboxLabel'>
+							<X>4%</X>
+							<Y>30%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisForsakenDen</Text>
+						</Text>
+						<combobox name='SerpentisForsakenDenCombobox'>
+							<X>1%</X>
+							<Y>30%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForsakenDenPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForsakenDenPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisForsakenDenPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Forsaken Den",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisForlornDenComboboxLabel'>
+							<X>4%</X>
+							<Y>33%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisForlornDen</Text>
+						</Text>
+						<combobox name='SerpentisForlornDenCombobox'>
+							<X>1%</X>
+							<Y>33%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForlornDenPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForlornDenPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisForlornDenPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Forlorn Den",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisYardComboboxLabel'>
+							<X>4%</X>
+							<Y>37%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisYard</Text>
+						</Text>
+						<combobox name='SerpentisYardCombobox'>
+							<X>1%</X>
+							<Y>37%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisYardPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisYardPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisYardPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Yard",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisRallyPointComboboxLabel'>
+							<X>4%</X>
+							<Y>41%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisRallyPoint</Text>
+						</Text>
+						<combobox name='SerpentisRallyPointCombobox'>
+							<X>1%</X>
+							<Y>41%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisRallyPointPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisRallyPointPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisRallyPointPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Rally Point",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisHiddenRallyPointComboboxLabel'>
+							<X>4%</X>
+							<Y>44%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisHiddenRallyPoint</Text>
+						</Text>
+						<combobox name='SerpentisHiddenRallyPointCombobox'>
+							<X>1%</X>
+							<Y>44%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHiddenRallyPointPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHiddenRallyPointPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisHiddenRallyPointPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Hidden Rally Point",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisForsakenRallyPointComboboxLabel'>
+							<X>4%</X>
+							<Y>47%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisForsakenRallyPoint</Text>
+						</Text>
+						<combobox name='SerpentisForsakenRallyPointCombobox'>
+							<X>1%</X>
+							<Y>47%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForsakenRallyPointPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForsakenRallyPointPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisForsakenRallyPointPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Forsaken Rally Point",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisForlornRallyPointComboboxLabel'>
+							<X>4%</X>
+							<Y>50%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisForlornRallyPoint</Text>
+						</Text>
+						<combobox name='SerpentisForlornRallyPointCombobox'>
+							<X>1%</X>
+							<Y>50%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForlornRallyPointPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForlornRallyPointPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisForlornRallyPointPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Forlorn Rally Point",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisPortComboboxLabel'>
+							<X>4%</X>
+							<Y>54%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisPort</Text>
+						</Text>
+						<combobox name='SerpentisPortCombobox'>
+							<X>1%</X>
+							<Y>54%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisPortPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisPortPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisPortPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Port",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisHubComboboxLabel'>
+							<X>4%</X>
+							<Y>58%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisHub</Text>
+						</Text>
+						<combobox name='SerpentisHubCombobox'>
+							<X>1%</X>
+							<Y>58%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHubPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHubPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisHubPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Hub",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisHiddenHubComboboxLabel'>
+							<X>4%</X>
+							<Y>61%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisHiddenHub</Text>
+						</Text>
+						<combobox name='SerpentisHiddenHubCombobox'>
+							<X>1%</X>
+							<Y>61%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHiddenHubPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHiddenHubPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisHiddenHubPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Hidden Hub",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisForsakenHubComboboxLabel'>
+							<X>4%</X>
+							<Y>64%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisForsakenHub</Text>
+						</Text>
+						<combobox name='SerpentisForsakenHubCombobox'>
+							<X>1%</X>
+							<Y>64%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForsakenHubPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForsakenHubPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisForsakenHubPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Forsaken Hub",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisForlornHubComboboxLabel'>
+							<X>4%</X>
+							<Y>67%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisForlornHub</Text>
+						</Text>
+						<combobox name='SerpentisForlornHubCombobox'>
+							<X>1%</X>
+							<Y>67%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForlornHubPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisForlornHubPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisForlornHubPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Forlorn Hub",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisHavenComboboxLabel'>
+							<X>4%</X>
+							<Y>71%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisHaven</Text>
+						</Text>
+						<combobox name='SerpentisHavenCombobox'>
+							<X>1%</X>
+							<Y>71%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHavenPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisHavenPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisHavenPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Haven",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='SerpentisSanctumComboboxLabel'>
+							<X>4%</X>
+							<Y>75%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>SerpentisSanctum</Text>
+						</Text>
+						<combobox name='SerpentisSanctumCombobox'>
+							<X>1%</X>
+							<Y>75%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisSanctumPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.SerpentisSanctumPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetSerpentisSanctumPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Serpentis Sanctum",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+					</Tab>	
+					<Tab Name='Drone/MiscAnoms'>
+						<frame name='Drone/MiscAnoms'>
+							<BackgroundColor>FF000000</BackgroundColor>
+							<Border>1</Border>
+							<BorderColor>FFFFFFFF</BorderColor>
+							<X>0</X>
+							<Y>0</Y>
+							<Height>100%</Height>
+							<Width>100%</Width>
+							<OnLoad>
+								This:SetLeftClickThru[TRUE]
+							</OnLoad>
+						</frame>
+					<button	Name='AnomTabRecalcButton'>
+						<Font template='Button.Font' />
+						<BackgroundColor>FF000000</BackgroundColor>
+						<X>69%</X>
+						<Y>5%</Y>
+						<Width>21%</Width>
+						<Height>15%</Height>
+						<Text>Recalculate Priorities</Text>
+						<OnLeftClick>
+							Script[Tehbot].VariableScope.CombatAnoms.ReCalculatePriorities:Set[TRUE]
+						</OnLeftClick>
+					</button>
+					<Text name='DroneClusterComboboxLabel'>
+							<X>4%</X>
+							<Y>3%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneCluster</Text>
+						</Text>
+						<combobox name='DroneClusterCombobox'>
+							<X>1%</X>
+							<Y>3%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneClusterPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneClusterPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneClusterPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Cluster",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DroneCollectionComboboxLabel'>
+							<X>4%</X>
+							<Y>7%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneCollection</Text>
+						</Text>
+						<combobox name='DroneCollectionCombobox'>
+							<X>1%</X>
+							<Y>7%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneCollectionPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneCollectionPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneCollectionPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Collection",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DroneAssemblyComboboxLabel'>
+							<X>4%</X>
+							<Y>11%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneAssembly</Text>
+						</Text>
+						<combobox name='DroneAssemblyCombobox'>
+							<X>1%</X>
+							<Y>11%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneAssemblyPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneAssemblyPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneAssemblyPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Assembly",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DroneGatheringComboboxLabel'>
+							<X>4%</X>
+							<Y>15%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneGathering</Text>
+						</Text>
+						<combobox name='DroneGatheringCombobox'>
+							<X>1%</X>
+							<Y>15%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneGatheringPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneGatheringPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneGatheringPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Gathering",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DroneSurveillanceComboboxLabel'>
+							<X>4%</X>
+							<Y>19%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneSurveillance</Text>
+						</Text>
+						<combobox name='DroneSurveillanceCombobox'>
+							<X>1%</X>
+							<Y>19%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneSurveillancePriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneSurveillancePriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneSurveillancePriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Surveillance",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DroneMenagerieComboboxLabel'>
+							<X>4%</X>
+							<Y>23%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneMenagerie</Text>
+						</Text>
+						<combobox name='DroneMenagerieCombobox'>
+							<X>1%</X>
+							<Y>23%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneMenageriePriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneMenageriePriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneMenageriePriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Menagerie",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DroneHerdComboboxLabel'>
+							<X>4%</X>
+							<Y>27%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneHerd</Text>
+						</Text>
+						<combobox name='DroneHerdCombobox'>
+							<X>1%</X>
+							<Y>27%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneHerdPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneHerdPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneHerdPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Herd",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DroneSquadComboboxLabel'>
+							<X>4%</X>
+							<Y>31%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneSquad</Text>
+						</Text>
+						<combobox name='DroneSquadCombobox'>
+							<X>1%</X>
+							<Y>31%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneSquadPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneSquadPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneSquadPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Squad",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DronePatrolComboboxLabel'>
+							<X>4%</X>
+							<Y>35%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DronePatrol</Text>
+						</Text>
+						<combobox name='DronePatrolCombobox'>
+							<X>1%</X>
+							<Y>35%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DronePatrolPriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DronePatrolPriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDronePatrolPriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Patrol",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+
+					<Text name='DroneHordeComboboxLabel'>
+							<X>4%</X>
+							<Y>39%</Y>
+							<Width>50%</Width>
+							<Height>5%</Height>
+							<Alignment>Left</Alignment>
+							<Text>DroneHorde</Text>
+						</Text>
+						<combobox name='DroneHordeCombobox'>
+							<X>1%</X>
+							<Y>39%</Y>
+							<Width>40</Width> 
+							<Height>20</Height> 
+							<FullHeight>80</FullHeight>
+							<ButtonWidth>20</ButtonWidth>
+							<Items>
+								<Item Value='0'>0</Item>
+								<Item Value='1'>1</Item>
+								<Item Value='2'>2</Item>
+								<Item Value='3'>3</Item>
+							</Items>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneHordePriority} > -1
+								This.ItemByText[${Script[Tehbot].VariableScope.CombatAnoms.Config.DroneHordePriority}]:Select
+
+						</OnLoad>
+						<OnSelect>
+							Script[Tehbot].VariableScope.CombatAnoms.Config:SetDroneHordePriority[${This.SelectedItem.Value}]
+							Script[Tehbot].VariableScope.CombatAnoms.PriorityCombatCollection:Set["Drone Horde",${This.SelectedItem.Value}]
+						</OnSelect>
+						</combobox>
+						</Tab>	
+								</Tabs>
+
+
+								<OnSelect>
+								Script[Tehbot].VariableScope.CommonConfig:SetActiveTab[${This.SelectedTab.Name}]
+								</OnSelect>
+					</TabControl>
+				</Children>
+			</Frame>
+		</Children>
+	</window>
+
+</ISUI>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ISUI>
+	<template name='Information.Font'>
+		<Name>Segoe</Name>
+		<Size>24</Size>
+		<Color>FFFFFFFF</Color>
+	</template>
+
+	<window name='Tehbot_DroneControlCA'>
+		<Visible>1</Visible>
+		<BackGroundColor></BackGroundColor>
+		<Border>0</Border>
+		<X>200</X>
+		<Y>300</Y>
+		<Width>1100</Width>
+		<Height>650</Height>
+		<TitleBar>
+			<Width>100%</Width>
+			<Height>40</Height>
+			<Border>0</Border>
+			<BackgroundColor>FF000000</BackgroundColor>
+			<Children>
+				<Text name='Tehbot_DroneControlCA_TitleBar_Title'>
+					<X>0</X>
+					<Y>3</Y>
+					<Width>100%</Width>
+					<Height>40</Height>
+					<Alignment>Center</Alignment>
+					<Text>DroneControlCA Configuration</Text>
+				</Text>
+				<button	Name='Close'>
+					<X>r80</X>
+					<Y>0</Y>
+					<Width>80</Width>
+					<Height>40</Height>
+					<Text>Close</Text>
+					<OnLeftClick>
+						ui -unload "&filepath;/DroneControlCA"
+					</OnLeftClick>
+				</button>
+			</Children>
+		</TitleBar>
+		<Children name="Tehbot_DroneControlCA_Children">
+			<Frame name="Tehbot_DroneControlCA_Frame">
+				<X>0</X>
+				<Y>30</Y>
+				<Width>100%</Width>
+				<Height>100%</Height>
+				<BackgroundColor>FF000000</BackgroundColor>
+				<Border>1</Border>
+				<BorderColor>FFFFFFFF</BorderColor>
+				<Children name="Tehbot_DroneControlCA_Frame_Children">
+					<Text name='obj_DroneControlCAInformation'>
+						<Font template='Information.Font' />
+						<X>1%</X>
+						<Y>1%</Y>
+						<Width>98%</Width>
+						<Height>18%</Height>
+						<Wrap />
+						<Text>Choose one of the below. If you choose both or neither it defaults to original behaviors.</Text>
+					</Text>
+					<Text name='ArmorDronesTitle'>
+						<X>5%</X>
+						<Y>21%</Y>
+						<Width>30%</Width>
+						<Height>5%</Height>
+						<Alignment>Center</Alignment>
+						<Text>Using Armor Tanked Drones</Text>
+					</Text>
+					<Checkbox name='ArmorDrones'>
+						<X>1%</X>
+						<Y>21%</Y>
+						<Width>30%</Width>
+						<Height>3%</Height>
+						<Text>Using Armor Tanked Drones</Text>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.DroneControlCA.Config.ArmorDrones}
+							{
+								This:SetChecked
+							}
+						</OnLoad>
+						<OnLeftClick>
+							Script[Tehbot].VariableScope.DroneControlCA.Config:SetArmorDrones[${This.Checked}]
+						</OnLeftClick>
+					</Checkbox>
+					<Text name='ShieldDronesTitle'>
+						<X>5%</X>
+						<Y>25%</Y>
+						<Width>30%</Width>
+						<Height>5%</Height>
+						<Alignment>Center</Alignment>
+						<Text>Using Shield Tanked Drones</Text>
+					</Text>
+					<Checkbox name='ShieldDrones'>
+						<X>1%</X>
+						<Y>25%</Y>
+						<Width>30%</Width>
+						<Height>3%</Height>
+						<Text>Using Shield Tanked Drones</Text>
+						<OnLoad>
+							if ${Script[Tehbot].VariableScope.DroneControlCA.Config.ShieldDrones}
+							{
+								This:SetChecked
+							}
+						</OnLoad>
+						<OnLeftClick>
+							Script[Tehbot].VariableScope.DroneControlCA.Config:SetShieldDrones[${This.Checked}]
+						</OnLeftClick>
+					</Checkbox>
+				</Children>
+			</Frame>
+		</Children>
+	</window>
+
+</ISUI>
