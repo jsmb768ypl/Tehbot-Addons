@@ -1,9 +1,9 @@
 
-objectdef obj_Configuration_CombatAnoms inherits obj_Configuration_Base
+objectdef obj_Configuration_CombatAnoms2 inherits obj_Configuration_Base
 {
 	method Initialize()
 	{
-		This[parent]:Initialize["CombatAnoms"]
+		This[parent]:Initialize["CombatAnoms2"]
 	}
 
 	method Set_Default_Values()
@@ -244,7 +244,7 @@ objectdef obj_Configuration_CombatAnoms inherits obj_Configuration_Base
 	Setting(int, LogLevelBar, SetLogLevelBar)
 }
 
-objectdef obj_CombatAnoms inherits obj_StateQueue
+objectdef obj_CombatAnoms2 inherits obj_StateQueue
 {
 
 	; We are setting this to true to force skip repair until I can get that working in strucutres
@@ -274,9 +274,9 @@ objectdef obj_CombatAnoms inherits obj_StateQueue
 	variable obj_TargetList ActiveNPCs
 	variable obj_TargetList Lootables
 
-	variable obj_Configuration_CombatAnoms Config
+	variable obj_Configuration_CombatAnom2s Config
 	variable obj_Configuration_Agents Agents
-	variable obj_CombatAnomsUI LocalUI
+	variable obj_CombatAnoms2UI LocalUI
 
 	variable bool reload = TRUE
 	variable bool halt = FALSE
@@ -340,14 +340,14 @@ objectdef obj_CombatAnoms inherits obj_StateQueue
 	{
 		This[parent]:Initialize
 
-		DynamicAddBehavior("CombatAnoms", "CombatAnoms Runner")
+		DynamicAddBehavior("CombatAnoms2", "CombatAnoms2 ")
 		This.PulseFrequency:Set[3500]
 
-		if !${PriorityCombatCollection.FirstValue(exists)} && ${CommonConfig.Tehbot_Mode.Equal["CombatAnoms"]}
+		if !${PriorityCombatCollection.FirstValue(exists)} && ${CommonConfig.Tehbot_Mode.Equal["CombatAnoms2"]}
 		{
-			timedcommand 0 "ui -load \"${Script.CurrentDirectory}/behavior/CombatAnoms.xml\""
+			timedcommand 0 "ui -load \"${Script.CurrentDirectory}/behavior/CombatAnoms2.xml\""
 			
-			timedcommand 30 "ui -unload \"${Script.CurrentDirectory}/behavior/CombatAnoms.xml\""
+			timedcommand 30 "ui -unload \"${Script.CurrentDirectory}/behavior/CombatAnoms2.xml\""
 
 
 		}
@@ -853,7 +853,7 @@ objectdef obj_CombatAnoms inherits obj_StateQueue
 				}
 				elseif ${HighPriorityCombatAnomalies.Contains[${MyAnomalies_Iterator.Value.DungeonName}]} && !${SomeoneElsesAnomalies.Contains[${MyAnomalies_Iterator.Value.Name}]}
 				{
-					Script[Tehbot].VariableScope.CombatAnoms.Config:setPersistentAnomID[${MyAnomalies_Iterator.Value.ID}]
+					Script[Tehbot].VariableScope.CombatAnoms2.Config:setPersistentAnomID[${MyAnomalies_Iterator.Value.ID}]
 					CurrentAnomCoords:Set[${MyAnomalies_Iterator.Value.X},${MyAnomalies_Iterator.Value.Y},${MyAnomalies_Iterator.Value.Z}]
 					CurrentAnomID:Set[${MyAnomalies_Iterator.Value.Name}]
 					MyAnomalies_Iterator.Value:WarpTo[${Config.WarpInDistance}, FALSE]
@@ -865,7 +865,7 @@ objectdef obj_CombatAnoms inherits obj_StateQueue
 				}
 				elseif ${MediumPriorityCombatAnomalies.Contains[${MyAnomalies_Iterator.Value.DungeonName}]} && !${SomeoneElsesAnomalies.Contains[${MyAnomalies_Iterator.Value.Name}]}
 				{
-					Script[Tehbot].VariableScope.CombatAnoms.Config:setPersistentAnomID[${MyAnomalies_Iterator.Value.ID}]
+					Script[Tehbot].VariableScope.CombatAnoms2.Config:setPersistentAnomID[${MyAnomalies_Iterator.Value.ID}]
 					CurrentAnomCoords:Set[${MyAnomalies_Iterator.Value.X},${MyAnomalies_Iterator.Value.Y},${MyAnomalies_Iterator.Value.Z}]
 					CurrentAnomID:Set[${MyAnomalies_Iterator.Value.Name}]
 					MyAnomalies_Iterator.Value:WarpTo[${Config.WarpInDistance}, FALSE]
@@ -878,7 +878,7 @@ objectdef obj_CombatAnoms inherits obj_StateQueue
 				; Everything else goes here
 				elseif ${LowPriorityCombatAnomalies.Contains[${MyAnomalies_Iterator.Value.DungeonName}]} && !${SomeoneElsesAnomalies.Contains[${MyAnomalies_Iterator.Value.Name}]}
 				{
-					Script[Tehbot].VariableScope.CombatAnoms.Config:setPersistentAnomID[${MyAnomalies_Iterator.Value.ID}]
+					Script[Tehbot].VariableScope.CombatAnoms2.Config:setPersistentAnomID[${MyAnomalies_Iterator.Value.ID}]
 					CurrentAnomCoords:Set[${MyAnomalies_Iterator.Value.X},${MyAnomalies_Iterator.Value.Y},${MyAnomalies_Iterator.Value.Z}]
 					CurrentAnomID:Set[${MyAnomalies_Iterator.Value.Name}]
 					MyAnomalies_Iterator.Value:WarpTo[${Config.WarpInDistance}, FALSE]
@@ -2385,7 +2385,7 @@ objectdef obj_CombatAnoms inherits obj_StateQueue
 }
 
 
-objectdef obj_CombatAnomsUI inherits obj_State
+objectdef obj_CombatAnoms2UI inherits obj_State
 {
 	method Initialize()
 	{
