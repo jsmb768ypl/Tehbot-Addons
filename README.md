@@ -41,7 +41,7 @@ This minimode will add each user that is running this minimode to a sqlite list,
 <br />
 </p>
 
-- [ ] Initial Release (Planned for 2/8/2025)
+- [X] Initial Release
 - [ ] Add the ability to only use a certain number of reps on our rep target leaving the other reps free to use as needed on anyone who needs them.
     - [ ] Add the ability to set a threshold for when to rep others
     - [ ] Add the ability to set if we should only rep those found in the participant list or anyone within range in fleet.
