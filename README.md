@@ -36,10 +36,6 @@ Each script listed below will have inside of it the required files in the same s
 ## Scripts & Their Roadmaps
 
 <h4>SpiderRepTank - Minimode</h4>
-<p>
-This minimode will add each user that is running this minimode to a sqlite list, it will then as the name suggests lock and begin repping the person below them in the list, if they are the last person in the list then they will lock and rep the first person in the list. It will detect if you have shield or armor reps and use all of them on the specific target. It will also assume you have cap transfer and use all of those as well. You must be cap stable, we do not turn reps on and off based on cap we only activate and leave running the reps & cap transfer. You have to either manually pilot or use some way to pilot the ships, we do nothing to make sure we are in range of our specified rep target, this minimode is strictly for handling the assignment of the spidertank position and keeping the reps on them. 
-<br />
-</p>
 
 - [X] Initial Release
 - [ ] Add the ability to only use a certain number of reps on our rep target leaving the other reps free to use as needed on anyone who needs them.
@@ -47,11 +43,12 @@ This minimode will add each user that is running this minimode to a sqlite list,
     - [ ] Add the ability to set if we should only rep those found in the participant list or anyone within range in fleet.
 - [ ] Add the ability to say if we are using cap transfer or not
 
-<h4>StructureKiller - Behavior</h4>
 <p>
-This behavior allows you to set who your leaders is, it will then begin approching the leader, if you are the leader then it will orbit the target structure. This will begin locking and firing on the closest structure available to us (Citadels & Customs Offices). This currently is specific to the Triglavian ships (Tested so far using Kiki and Vedmaks)
+This minimode will add each user that is running this minimode to a sqlite list, it will then as the name suggests lock and begin repping the person below them in the list, if they are the last person in the list then they will lock and rep the first person in the list. It will detect if you have shield or armor reps and use all of them on the specific target. It will also assume you have cap transfer and use all of those as well. You must be cap stable, we do not turn reps on and off based on cap we only activate and leave running the reps & cap transfer. You have to either manually pilot or use some way to pilot the ships, we do nothing to make sure we are in range of our specified rep target, this minimode is strictly for handling the assignment of the spidertank position and keeping the reps on them. 
 <br />
 </p>
+
+<h4>StructureKiller - Behavior</h4>
 
 - [ ] Initial Release (Unknown if it will be publically released)
 - [ ] Add the ability to monitor for non fleet members
@@ -63,17 +60,28 @@ This behavior allows you to set who your leaders is, it will then begin approchi
 - [ ] Add the ability to use drone boats instead of triglavian ships
     - [ ] Add the ability to assign the drones to the leader for fighting purposes
 
-<h4>CombatAnoms - Behavior</h4>
 <p>
-This was originally written by Elusif, I have modified it and am trying to get it working 100%. Currently it can repair, undock and run the anoms you set it run, dock up if local has unfriendlies and undock after they leave. It currently can't reload drones or repair while running. I have modified this to only work with drone boats. 
+This behavior allows you to set who your leaders is, it will then begin approching the leader, if you are the leader then it will orbit the target structure. This will begin locking and firing on the closest structure available to us (Citadels & Customs Offices). This currently is specific to the Triglavian ships (Tested so far using Kiki and Vedmaks)
 <br />
 </p>
+
+<h4>CombatAnoms - Behavior</h4>
 
 - [X] Initial Release 
 - [ ] Add the ability to dock up when needed
     - [ ] Check if we need to reload drones, dock up and reload drones
     - [ ] Check if we need to repair, if we do dock up and repair
 - [ ] Add the ability to use something other than drone boats
+
+<p>
+This was originally written by Elusif, I have modified it and am trying to get it working 100%. Currently it can repair, undock and run the anoms you set it run, dock up if local has unfriendlies and undock after they leave. It currently can't reload drones or repair while running. I have modified this to only work with drone boats. 
+</p>
+
+Settings:
+* Check the box that says "Use Drones"
+* Check the box that says "Drone Boat?"
+* Bottom left box is to set your home station bookmark.
+*  Use the tab at the top to pick your location, then set the priority of what you want to run. Priority 1 - Highest, 3 - Lowest, 0 - Disabled
 
 Requirements:
 * Issues can be logged here to me and not on the main Tehbot github allowing me to work on them at my pace.
