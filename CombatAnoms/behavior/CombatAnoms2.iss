@@ -274,7 +274,7 @@ objectdef obj_CombatAnoms2 inherits obj_StateQueue
 	variable obj_TargetList ActiveNPCs
 	variable obj_TargetList Lootables
 
-	variable obj_Configuration_CombatAnom2s Config
+	variable obj_Configuration_CombatAnoms2 Config
 	variable obj_Configuration_Agents Agents
 	variable obj_CombatAnoms2UI LocalUI
 
