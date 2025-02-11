@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ISUI>
 	<template name='Information.Font'>
 		<Name>Segoe</Name>
@@ -221,8 +221,8 @@
 									}
 									else
 									{
-										UIElement[SRAmmoLabel2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
-										UIElement[SRAmmo2@Tehbot_CombatAnoms_Frame@Tehbot_CombatAnoms]:Hide
+										UIElement[SRAmmoLabel2@Tehbot_CombatAnoms2_Frame@Tehbot_CombatAnoms2]:Hide
+										UIElement[SRAmmo2@Tehbot_CombatAnoms2_Frame@Tehbot_CombatAnoms2]:Hide
 									}
 								</OnLeftClick>
 								<OnMouseEnter>
