@@ -1087,7 +1087,7 @@ objectdef obj_CombatAnoms2 inherits obj_StateQueue
 			; and warp in at some distance and orbit either an MTU or some object.
 			; Maybe a third case for just chasing shit around the anom but that sounds rather exceptionally stupid in 0.0
 			; So maybe not.
-
+			TargetManager.ActiveNPCs.TargetList.Get[1]:Orbit[${OurOrbitDistance}]
 			return FALSE
 		}
 
