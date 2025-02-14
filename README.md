@@ -5,7 +5,7 @@
   <p align="center">
     Here you will find behaviors and addons that you can download and add to your Tehbot, this is not a full working version of Tehbot and only meant for me to keep my Behaviors and Minimodes updated.
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/EveScripting/Tehbot-Addons/issues/new?template=bug_report.md">Report Bug</a>
     &middot;
     <a href="https://github.com/othneildrew/Best-README-Template/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
