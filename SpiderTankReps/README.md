@@ -12,8 +12,9 @@ This minimode will add each user that is running this minimode to a sqlite list,
 </p>
 <p>After placing in your minimode folder, you will need to update the main bot file "Tehbot.iss"
 You will need to add the following lines of code with the other minimodes:
-</p>
+
 ```
 #include minimode/SpiderTankReps.iss
 declarevariable SpiderTankReps obj_SpiderTankReps script
 ```
+</p>
