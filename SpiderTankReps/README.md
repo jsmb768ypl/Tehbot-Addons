@@ -10,7 +10,7 @@
 This minimode will add each user that is running this minimode to a sqlite list, it will then as the name suggests lock and begin repping the person below them in the list, if they are the last person in the list then they will lock and rep the first person in the list. It will detect if you have shield or armor reps and use all of them on the specific target. It will also assume you have cap transfer and use all of those as well. You must be cap stable, we do not turn reps on and off based on cap we only activate and leave running the reps & cap transfer. You have to either manually pilot or use some way to pilot the ships, we do nothing to make sure we are in range of our specified rep target, this minimode is strictly for handling the assignment of the spidertank position and keeping the reps on them. 
 <br />
 </p>
-<p>After placing in your minimode folder, you will need to update the main bot file "Tehbot.iss"
+<p>After placing in your minimode folder, you will need to update the main bot file "Tehbot.iss" <br />
 You will need to add the following lines of code with the other minimodes:
 
 ```
