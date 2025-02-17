@@ -1103,6 +1103,15 @@ objectdef obj_DroneControlCA inherits obj_StateQueue
 			}
 		}
 
+		; When neutral standings or worse are in local, scoop drones 
+		if !${FriendlyLocal}
+		{
+			Busy:SetBusy["DroneControlCA"]
+			Drones:RecallAll
+			This:QueueState["Idle", 11000]
+			This:QueueState["RecallCheck"]
+		}
+		
 		if ${CurrentTarget} != 0
 		{
 			;;; MJD Inhibition signal from MissionTargetManager

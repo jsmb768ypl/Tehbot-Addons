@@ -483,10 +483,21 @@ objectdef obj_CombatAnoms2 inherits obj_StateQueue
 			This:LogInfo["We dead"]
 			This:Stop
 		}
+		
+		
+		;
+		;
+		;
+		;
+		;
+		;
+		
+		
 		; People with neutral standings or worse are in local, and we are configured to run. Run.
 		if !${FriendlyLocal}
 		{
 			This:LogInfo["Jerks in Local, lets get out of here"]
+			
 			; If we are set to run to a POS
 			if ${Config.UsePOSHidingSpot} && ${Config.POSBookmarkName.NotNULLOrEmpty}
 			{
@@ -516,6 +527,7 @@ objectdef obj_CombatAnoms2 inherits obj_StateQueue
 				This:InsertState["WeirdNavigation"]
 				return TRUE
 			}
+			This:QueueState["Idle", 13000]
 			Move:Bookmark["${Config.HomeStructure}"]
 			This:InsertState["Traveling"]
 			This:QueueState["CheckForWork", 300000]
@@ -642,60 +654,80 @@ objectdef obj_CombatAnoms2 inherits obj_StateQueue
 				return TRUE
 			}
 		}
-		; Drones, I guess? Not gonna be very complicated. I lied it will be slightly more complicated as I think up dumb edgecases.
-		; If your drone bay capacity is 25m3 or less, missing 10m3 of drones triggers a reload. If it is 30 to 50, missing 20m3 triggers a reload. If it is greater than 50, triggers on 30m3.
+		; Added drones check with support for large drone bays (375m3)
 		if ${Config.UseDrones}
 		{
+			; Ensure drone bay window is open
 			if (!${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay](exists)} || ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} < 0)
 			{
-				; Please keep your inventory open at all times, please.
 				EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay]:MakeActive
 				Client:Wait[1000]
 			}
-			
+
+			; Sanity check for drone bay existence
 			if ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} == 0
 			{
-				This:LogInfo["Look at this mook, configged to use drones on a ship without a drone bay. Stopping, fix your config."]
+				This:LogInfo["Ship has no drone bay! Stopping."]
 				return FALSE
 				This:Stop
 			}
-			
-			if ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} > 0 && ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} <= 25
-			{
-				if (${Math.Calc[${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} - ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].UsedCapacity}]}) > 10
-				{
-					This:LogInfo["Short on drones"]
-					StatusGreen:Set[FALSE]
-					StatusChecked:Set[TRUE]
-					This:InsertState["CheckForWork", 5000]
-					return TRUE
-				}
-			}
-			
-			if ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} > 25 && ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} <= 50
-			{
-				if (${Math.Calc[${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} - ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].UsedCapacity}]}) > 20
-				{
-					This:LogInfo["Short on drones"]
-					StatusGreen:Set[FALSE]
-					StatusChecked:Set[TRUE]
-					This:InsertState["CheckForWork", 5000]
-					return TRUE
-				}
-			}
+
+			; Custom check for 5 heavy drones (25m3 each) in large bays
 			if ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} > 50
 			{
-				if (${Math.Calc[${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} - ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].UsedCapacity}]}) > 30
+				; First priority check: Do we have at least 5 heavy drones (125m3)?
+				variable int RequiredVolumeFor5Heavy = 125
+				if ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].UsedCapacity} < ${RequiredVolumeFor5Heavy}
 				{
-					This:LogInfo["Short on drones"]
+					This:LogInfo["Short on drones: Need at least 5 heavy drones (${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].UsedCapacity}/125m3)"]
+					StatusGreen:Set[FALSE]
+					StatusChecked:Set[TRUE]
+					This:InsertState["CheckForWork", 5000]
+					return TRUE
+				}
+
+				; Original large bay check (50% free space) as fallback
+				variable int TotalCapacity = ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity}
+				variable int FreeSpaceThreshold = ${Math.Calc[${TotalCapacity} * 0.5].Int}
+
+				if (${Math.Calc[${TotalCapacity} - ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].UsedCapacity}]}) > ${FreeSpaceThreshold}
+				{
+					This:LogInfo["Short on drones: Large bay capacity warning"]
 					StatusGreen:Set[FALSE]
 					StatusChecked:Set[TRUE]
 					This:InsertState["CheckForWork", 5000]
 					return TRUE
 				}
 			}
-		
+			; If your drone bay capacity is 25m3 or less, missing 10m3 of drones triggers a reload. If it is 30 to 50, missing 20m3 triggers a reload. If it is greater than 50, triggers on 30m3.
+			else 
+			{
+				if ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} > 0 && ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} <= 25
+				{
+					if (${Math.Calc[${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} - ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].UsedCapacity}]}) > 10
+					{
+						This:LogInfo["Short on drones"]
+						StatusGreen:Set[FALSE]
+						StatusChecked:Set[TRUE]
+						This:InsertState["CheckForWork", 5000]
+						return TRUE
+					}
+				}
+
+				if ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} > 25 && ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} <= 50
+				{
+					if (${Math.Calc[${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].Capacity} - ${EVEWindow[Inventory].ChildWindow[${Me.ShipID}, ShipDroneBay].UsedCapacity}]}) > 20
+					{
+						This:LogInfo["Short on drones"]
+						StatusGreen:Set[FALSE]
+						StatusChecked:Set[TRUE]
+						This:InsertState["CheckForWork", 5000]
+						return TRUE
+					}
+				}
+			}
 		}
+			
 		; Check to see if we lost our MTU somewhere along the way.
 		if ${Config.UseMTU}
 		{
@@ -992,7 +1024,7 @@ objectdef obj_CombatAnoms2 inherits obj_StateQueue
 				return TRUE
 			}
 
-			This:InsertState["GoToStation", 3000]
+			This:InsertState["GoToStation", 13000]
 			This:QueueState["CheckForWork", 300000]
 			return TRUE
 			
